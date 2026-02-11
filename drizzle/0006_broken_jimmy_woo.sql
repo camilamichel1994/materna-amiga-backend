@@ -1,0 +1,1 @@
+ALTER TABLE "listings" ADD COLUMN "listing_type" text DEFAULT 'venda' NOT NULL;

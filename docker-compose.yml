@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: materna-amiga-db
+    restart: unless-stopped
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: materna_amiga
+    volumes:
+      - materna_amiga_data:/var/lib/postgresql/data
+
+volumes:
+  materna_amiga_data:
+

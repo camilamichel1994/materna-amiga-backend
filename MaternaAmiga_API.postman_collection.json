@@ -1,0 +1,782 @@
+{
+	"info": {
+		"_postman_id": "materna-amiga-api",
+		"name": "MaternaAmiga API",
+		"description": "Collection completa da API MaternaAmiga",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3333",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Autenticação",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"usuario@example.com\",\n  \"password\": \"senha123\",\n  \"remember\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"token\", jsonData.token);",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Login com Google",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idToken\": \"TOKEN_DO_FIREBASE_AQUI\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/google",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "google"]
+						}
+					}
+				},
+				{
+					"name": "Registro",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Maria Silva\",\n  \"email\": \"maria@example.com\",\n  \"password\": \"senha123\",\n  \"acceptTerms\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/signup",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "signup"]
+						}
+					}
+				},
+				{
+					"name": "Esqueci a Senha",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"usuario@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/forgot-password",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "forgot-password"]
+						}
+					}
+				},
+				{
+					"name": "Redefinir Senha",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"TOKEN_DE_RESET\",\n  \"newPassword\": \"NovaSenha123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/reset-password",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "reset-password"]
+						}
+					}
+				},
+				{
+					"name": "Meu Perfil (Validar Token)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "me"]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "logout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Produtos/Listings",
+			"item": [
+				{
+					"name": "Listar Produtos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/listings?q=&condition=&priceMin=&priceMax=&city=&sortBy=createdAt&sortOrder=desc&page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["listings"],
+							"query": [
+								{"key": "q", "value": ""},
+								{"key": "condition", "value": ""},
+								{"key": "priceMin", "value": ""},
+								{"key": "priceMax", "value": ""},
+								{"key": "city", "value": ""},
+								{"key": "sortBy", "value": "createdAt"},
+								{"key": "sortOrder", "value": "desc"},
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Obter Detalhes do Produto",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/listings/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["listings", ":id"],
+							"variable": [
+								{"key": "id", "value": "UUID_DO_PRODUTO"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Criar Anúncio",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Carrinho de Bebê\",\n  \"description\": \"Carrinho de bebê em excelente estado, pouco usado.\",\n  \"condition\": \"Usado - Excelente\",\n  \"price\": 250.00,\n  \"message\": \"Entrego em mãos\",\n  \"city\": \"São Paulo\",\n  \"photos\": [\"https://example.com/photo1.jpg\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/listings",
+							"host": ["{{baseUrl}}"],
+							"path": ["listings"]
+						}
+					}
+				},
+				{
+					"name": "Atualizar Produto",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Carrinho de Bebê Atualizado\",\n  \"price\": 200.00\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/listings/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["listings", ":id"],
+							"variable": [
+								{"key": "id", "value": "UUID_DO_PRODUTO"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Deletar Produto",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/listings/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["listings", ":id"],
+							"variable": [
+								{"key": "id", "value": "UUID_DO_PRODUTO"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Produtos Similares",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/listings/:id/similar",
+							"host": ["{{baseUrl}}"],
+							"path": ["listings", ":id", "similar"],
+							"variable": [
+								{"key": "id", "value": "UUID_DO_PRODUTO"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Favoritos",
+			"item": [
+				{
+					"name": "Listar Favoritos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/favorites",
+							"host": ["{{baseUrl}}"],
+							"path": ["favorites"]
+						}
+					}
+				},
+				{
+					"name": "Adicionar aos Favoritos",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"item_id\": \"UUID_DO_ITEM\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/favorites",
+							"host": ["{{baseUrl}}"],
+							"path": ["favorites"]
+						}
+					}
+				},
+				{
+					"name": "Remover dos Favoritos",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/favorites/:item_id",
+							"host": ["{{baseUrl}}"],
+							"path": ["favorites", ":item_id"],
+							"variable": [
+								{"key": "item_id", "value": "UUID_DO_ITEM"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Wishlist",
+			"item": [
+				{
+					"name": "Listar Wishlist",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/wishlist",
+							"host": ["{{baseUrl}}"],
+							"path": ["wishlist"]
+						}
+					}
+				},
+				{
+					"name": "Adicionar à Wishlist",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"Roupas\",\n  \"size\": \"6 meses\",\n  \"brand\": \"Carter's\",\n  \"description\": \"Procurando roupas de bebê\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/wishlist",
+							"host": ["{{baseUrl}}"],
+							"path": ["wishlist"]
+						}
+					}
+				},
+				{
+					"name": "Atualizar Item da Wishlist",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"Roupas Atualizado\",\n  \"size\": \"12 meses\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/wishlist/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["wishlist", ":id"],
+							"variable": [
+								{"key": "id", "value": "UUID_DO_ITEM"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Remover da Wishlist",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/wishlist/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["wishlist", ":id"],
+							"variable": [
+								{"key": "id", "value": "UUID_DO_ITEM"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Chat/Mensagens",
+			"item": [
+				{
+					"name": "Listar Conversas",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/chats",
+							"host": ["{{baseUrl}}"],
+							"path": ["chats"]
+						}
+					}
+				},
+				{
+					"name": "Obter Mensagens",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/chats/:chat_id/messages?page=1&limit=50",
+							"host": ["{{baseUrl}}"],
+							"path": ["chats", ":chat_id", "messages"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "50"}
+							],
+							"variable": [
+								{"key": "chat_id", "value": "UUID_DO_CHAT"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Enviar Mensagem",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Olá, tenho interesse no produto!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chats/:chat_id/messages",
+							"host": ["{{baseUrl}}"],
+							"path": ["chats", ":chat_id", "messages"],
+							"variable": [
+								{"key": "chat_id", "value": "UUID_DO_CHAT"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Criar Nova Conversa",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"item_id\": \"UUID_DO_ITEM\",\n  \"receiver_id\": \"UUID_DO_USUARIO\",\n  \"message\": \"Olá, tenho interesse no produto!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chats",
+							"host": ["{{baseUrl}}"],
+							"path": ["chats"]
+						}
+					}
+				},
+				{
+					"name": "Marcar como Lida",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/chats/:chat_id/read",
+							"host": ["{{baseUrl}}"],
+							"path": ["chats", ":chat_id", "read"],
+							"variable": [
+								{"key": "chat_id", "value": "UUID_DO_CHAT"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Troca/Exchange",
+			"item": [
+				{
+					"name": "Listar Itens Disponíveis",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/exchanges/available",
+							"host": ["{{baseUrl}}"],
+							"path": ["exchanges", "available"]
+						}
+					}
+				},
+				{
+					"name": "Propor Troca",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"offered_item_id\": \"UUID_ITEM_OFERECIDO\",\n  \"requested_item_id\": \"UUID_ITEM_SOLICITADO\",\n  \"message\": \"Gostaria de trocar este item\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/exchanges",
+							"host": ["{{baseUrl}}"],
+							"path": ["exchanges"]
+						}
+					}
+				},
+				{
+					"name": "Listar Propostas de Troca",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/exchanges?status=pending",
+							"host": ["{{baseUrl}}"],
+							"path": ["exchanges"],
+							"query": [
+								{"key": "status", "value": "pending", "description": "pending, accepted, rejected"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Aceitar/Rejeitar Troca",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"accepted\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/exchanges/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["exchanges", ":id"],
+							"variable": [
+								{"key": "id", "value": "UUID_DA_TROCA"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Perfil",
+			"item": [
+				{
+					"name": "Obter Perfil",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/profile/:id?reviewsPage=1&reviewsLimit=5",
+							"host": ["{{baseUrl}}"],
+							"path": ["profile", ":id"],
+							"query": [
+								{"key": "reviewsPage", "value": "1"},
+								{"key": "reviewsLimit", "value": "5"}
+							],
+							"variable": [
+								{"key": "id", "value": "UUID_DO_USUARIO"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Atualizar Perfil",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Maria Silva\",\n  \"location\": \"São Paulo\",\n  \"baby_age_range\": \"6-12 meses\",\n  \"avatar_url\": \"https://example.com/avatar.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", ":id"],
+							"variable": [
+								{"key": "id", "value": "UUID_DO_USUARIO"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Listar Produtos do Usuário",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/:id/items",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", ":id", "items"],
+							"variable": [
+								{"key": "id", "value": "UUID_DO_USUARIO"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Avaliar Usuário",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"rating\": 5,\n  \"comment\": \"Excelente vendedora!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/:id/ratings",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", ":id", "ratings"],
+							"variable": [
+								{"key": "id", "value": "UUID_DO_USUARIO"}
+							]
+						}
+					}
+				}
+			]
+		}
+	]
+}
+
