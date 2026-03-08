@@ -343,6 +343,7 @@ export async function getListings(params: GetListingsInput) {
         city: listings.city,
         photos: listings.photos,
         rating: listings.rating,
+        ownerId: listings.ownerId,
         createdAt: listings.createdAt,
       })
       .from(listings)
@@ -361,6 +362,7 @@ export async function getListings(params: GetListingsInput) {
       city: listing.city,
       photos: listing.photos,
       rating: listing.rating ? Number.parseFloat(listing.rating) : 0,
+      ownerId: listing.ownerId,
       createdAt: listing.createdAt.toISOString(),
     }))
 
@@ -645,6 +647,7 @@ export async function updateListing(
         message: listings.message,
         city: listings.city,
         photos: listings.photos,
+        ownerId: listings.ownerId,
         createdAt: listings.createdAt,
         updatedAt: listings.updatedAt,
       })
@@ -664,6 +667,7 @@ export async function updateListing(
         message: listing.message,
         city: listing.city,
         images: listing.photos,
+        ownerId: listing.ownerId,
         created_at: listing.createdAt.toISOString(),
         updated_at: listing.updatedAt.toISOString(),
       },
