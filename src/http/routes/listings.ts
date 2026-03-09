@@ -11,6 +11,7 @@ export const listingsRoutes: FastifyPluginAsyncZod = async app => {
       schema: {
         querystring: z.object({
           q: z.string().optional(),
+          ownerId: z.string().optional(),
           condition: z.string().optional(),
           listingType: z.string().optional(), // ex: "venda" ou "doacao,troca" (filtrar por doação, troca ou venda)
           priceMin: z.coerce.number().optional(),
@@ -24,9 +25,10 @@ export const listingsRoutes: FastifyPluginAsyncZod = async app => {
       },
     },
     async (request, reply) => {
-      const { q, condition, listingType, priceMin, priceMax, city, sortBy, sortOrder, page, limit } =
+      const { q, ownerId, condition, listingType, priceMin, priceMax, city, sortBy, sortOrder, page, limit } =
         request.query as {
           q?: string
+          ownerId?: string
           condition?: string
           listingType?: string
           priceMin?: number
@@ -40,6 +42,7 @@ export const listingsRoutes: FastifyPluginAsyncZod = async app => {
 
       const result = await getListings({
         q,
+        ownerId,
         condition,
         listingType,
         priceMin,

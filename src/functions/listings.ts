@@ -215,6 +215,7 @@ type SortOrder = (typeof allowedSortOrder)[number]
 
 interface GetListingsInput {
   q?: string
+  ownerId?: string
   condition?: string
   /** Um ou mais tipos separados por vírgula: venda, doacao, troca */
   listingType?: string
@@ -280,6 +281,10 @@ export async function getListings(params: GetListingsInput) {
           ilike(listings.description, `%${params.q}%`)
         )
       )
+    }
+
+    if (params.ownerId) {
+      filters.push(eq(listings.ownerId, params.ownerId))
     }
 
     if (params.condition) {
