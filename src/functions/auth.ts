@@ -153,11 +153,13 @@ export async function login(data: LoginInput) {
     success: true,
     status: 200,
     data: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        expiresAt: expiresAt.toISOString(),
+      },
       token,
-      expiresAt: expiresAt.toISOString(),
     },
   }
 }
