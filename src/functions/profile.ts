@@ -41,6 +41,9 @@ export async function getProfile(data: GetProfileInput) {
       .select({
         id: users.id,
         name: users.name,
+        avatarUrl: users.avatarUrl,
+        location: users.location,
+        babyAgeRange: users.babyAgeRange,
       })
       .from(users)
       .where(eq(users.id, userId))
@@ -55,15 +58,7 @@ export async function getProfile(data: GetProfileInput) {
       }
     }
 
-    const userRow = userResult[0]!
-
-    const user = {
-      id: userRow.id,
-      name: userRow.name,
-      avatarUrl: null as string | null,
-      location: null as string | null,
-      babyAgeRange: null as string | null,
-    }
+    const user = userResult[0]!
 
     let averageRating = 0
     let itemsSold = 0
