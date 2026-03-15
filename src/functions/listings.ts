@@ -1,6 +1,14 @@
 import { and, asc, count, desc, eq, gte, ilike, inArray, lte, ne, or, sql } from 'drizzle-orm'
 import { db } from '../db'
-import { listings, listingConditions, listingTypes, type ListingCondition, type ListingType, users, reviews } from '../db/schema'
+import { listings, listingConditions, listingTypes, type ListingCondition, type ListingType, users, reviews, transactions, exchanges } from '../db/schema'
+
+const soldOrTradedFilter = sql`${listings.id} NOT IN (
+  SELECT ${transactions.listingId} FROM ${transactions}
+  UNION
+  SELECT ${exchanges.offeredItemId} FROM ${exchanges} WHERE ${exchanges.status} = 'accepted'
+  UNION
+  SELECT ${exchanges.requestedItemId} FROM ${exchanges} WHERE ${exchanges.status} = 'accepted'
+)`
 
 function handleListingError(error: unknown, context: string): { status: number; error: string; message: string } {
   console.error(`Error ${context}:`, error)
@@ -272,14 +280,14 @@ export async function getListings(params: GetListingsInput) {
   const sortOrder = (params.sortOrder as SortOrder) || 'desc'
 
   try {
-    const filters = []
+    const filters = [soldOrTradedFilter]
 
     if (params.q) {
       filters.push(
         or(
           ilike(listings.name, `%${params.q}%`),
           ilike(listings.description, `%${params.q}%`)
-        )
+        )!
       )
     }
 
@@ -765,7 +773,8 @@ export async function getSimilarListings(listingId: string, limit: number = 5) {
           ne(listings.id, listingId),
           eq(listings.condition, currentListing.condition),
           currentListing.city ? eq(listings.city, currentListing.city) : undefined,
-          ne(listings.ownerId, currentListing.ownerId)
+          ne(listings.ownerId, currentListing.ownerId),
+          soldOrTradedFilter
         )
       )
       .limit(limit)

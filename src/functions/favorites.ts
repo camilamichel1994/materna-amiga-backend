@@ -1,6 +1,6 @@
-import { eq, and, desc, inArray } from 'drizzle-orm'
+import { eq, and, desc, inArray, sql } from 'drizzle-orm'
 import { db } from '../db'
-import { favorites, listings } from '../db/schema'
+import { favorites, listings, transactions, exchanges } from '../db/schema'
 
 export async function getFavorites(userId: string) {
   try {
@@ -33,7 +33,16 @@ export async function getFavorites(userId: string) {
         city: listings.city,
       })
       .from(listings)
-      .where(inArray(listings.id, listingIds))
+      .where(and(
+        inArray(listings.id, listingIds),
+        sql`${listings.id} NOT IN (
+          SELECT ${transactions.listingId} FROM ${transactions}
+          UNION
+          SELECT ${exchanges.offeredItemId} FROM ${exchanges} WHERE ${exchanges.status} = 'accepted'
+          UNION
+          SELECT ${exchanges.requestedItemId} FROM ${exchanges} WHERE ${exchanges.status} = 'accepted'
+        )`
+      ))
 
     const listingsMap = new Map(listingsData.map(listing => [listing.id, listing]))
 
