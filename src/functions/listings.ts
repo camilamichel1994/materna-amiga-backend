@@ -10,6 +10,16 @@ const soldOrTradedFilter = sql`${listings.id} NOT IN (
   SELECT ${exchanges.requestedItemId} FROM ${exchanges} WHERE ${exchanges.status} = 'accepted'
 )`
 
+const soldOrTradedCheck = sql<boolean>`(
+  ${listings.id} IN (
+    SELECT ${transactions.listingId} FROM ${transactions}
+    UNION
+    SELECT ${exchanges.offeredItemId} FROM ${exchanges} WHERE ${exchanges.status} = 'accepted'
+    UNION
+    SELECT ${exchanges.requestedItemId} FROM ${exchanges} WHERE ${exchanges.status} = 'accepted'
+  )
+)`.as('sold')
+
 function handleListingError(error: unknown, context: string): { status: number; error: string; message: string } {
   console.error(`Error ${context}:`, error)
   const msg = error instanceof Error ? error.message : String(error)
@@ -234,6 +244,7 @@ interface GetListingsInput {
   sortOrder?: string
   page?: number
   limit?: number
+  includeSold?: boolean
 }
 
 export async function getListings(params: GetListingsInput) {
@@ -280,7 +291,11 @@ export async function getListings(params: GetListingsInput) {
   const sortOrder = (params.sortOrder as SortOrder) || 'desc'
 
   try {
-    const filters = [soldOrTradedFilter]
+    const filters: ReturnType<typeof and>[] = []
+
+    if (!params.includeSold) {
+      filters.push(soldOrTradedFilter)
+    }
 
     if (params.q) {
       filters.push(
@@ -358,6 +373,7 @@ export async function getListings(params: GetListingsInput) {
         rating: listings.rating,
         ownerId: listings.ownerId,
         createdAt: listings.createdAt,
+        sold: soldOrTradedCheck,
       })
       .from(listings)
       .where(whereClause)
@@ -377,6 +393,7 @@ export async function getListings(params: GetListingsInput) {
       rating: listing.rating ? Number.parseFloat(listing.rating) : 0,
       ownerId: listing.ownerId,
       createdAt: listing.createdAt.toISOString(),
+      sold: listing.sold,
     }))
 
     return {
@@ -443,6 +460,15 @@ export async function getListingById(listingId: string) {
 
     const listing = result[0]!
 
+    const soldResult = await db
+      .select({ exists: sql<boolean>`EXISTS(
+        SELECT 1 FROM ${transactions} WHERE ${transactions.listingId} = ${listingId}
+        UNION
+        SELECT 1 FROM ${exchanges} WHERE (${exchanges.offeredItemId} = ${listingId} OR ${exchanges.requestedItemId} = ${listingId}) AND ${exchanges.status} = 'accepted'
+      )` })
+      .from(sql`(SELECT 1) AS _dummy`)
+    const sold = soldResult[0]?.exists ?? false
+
     const ownerReviews = await db
       .select({
         id: reviews.id,
@@ -493,6 +519,7 @@ export async function getListingById(listingId: string) {
         location: listing.city,
         rating: listing.rating ? Number.parseFloat(listing.rating) : 0,
         reviews: reviewsData,
+        sold,
         created_at: listing.createdAt.toISOString(),
         updated_at: listing.updatedAt.toISOString(),
       },

@@ -13,7 +13,7 @@ export const listingsRoutes: FastifyPluginAsyncZod = async app => {
           q: z.string().optional(),
           ownerId: z.string().optional(),
           condition: z.string().optional(),
-          listingType: z.string().optional(), // ex: "venda" ou "doacao,troca" (filtrar por doação, troca ou venda)
+          listingType: z.string().optional(),
           priceMin: z.coerce.number().optional(),
           priceMax: z.coerce.number().optional(),
           city: z.string().optional(),
@@ -21,11 +21,12 @@ export const listingsRoutes: FastifyPluginAsyncZod = async app => {
           sortOrder: z.string().optional(),
           page: z.coerce.number().int().positive().optional(),
           limit: z.coerce.number().int().positive().max(100).optional(),
+          includeSold: z.coerce.boolean().optional(),
         }),
       },
     },
     async (request, reply) => {
-      const { q, ownerId, condition, listingType, priceMin, priceMax, city, sortBy, sortOrder, page, limit } =
+      const { q, ownerId, condition, listingType, priceMin, priceMax, city, sortBy, sortOrder, page, limit, includeSold } =
         request.query as {
           q?: string
           ownerId?: string
@@ -38,6 +39,7 @@ export const listingsRoutes: FastifyPluginAsyncZod = async app => {
           sortOrder?: string
           page?: number
           limit?: number
+          includeSold?: boolean
         }
 
       const result = await getListings({
@@ -52,6 +54,7 @@ export const listingsRoutes: FastifyPluginAsyncZod = async app => {
         sortOrder,
         page,
         limit,
+        includeSold,
       })
 
       if (!result.success) {
