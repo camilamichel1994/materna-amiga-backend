@@ -5,6 +5,7 @@ import admin from 'firebase-admin'
 import { db } from '../db'
 import { users, passwordResetTokens } from '../db/schema'
 import { env } from '../env'
+import { sendPasswordResetEmail } from '../lib/email'
 
 interface SignupInput {
   name: string
@@ -220,7 +221,10 @@ export async function forgotPassword(data: ForgotPasswordInput) {
       expiresAt,
     })
 
-    console.log(`Reset token for ${user[0]!.email}: ${resetToken}`)
+    await sendPasswordResetEmail({
+      to: user[0]!.email,
+      resetToken,
+    })
   }
 
   return {
