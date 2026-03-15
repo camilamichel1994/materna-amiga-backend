@@ -106,10 +106,13 @@ export async function getProfile(data: GetProfileInput) {
 
     let formattedReviews: Array<{
       id: string
-      reviewerName: string
+      user: {
+        name: string
+        avatarUrl: string | null
+      }
       comment: string
       rating: number
-      date: string
+      created_at: string
     }> = []
     let totalReviews = 0
     let reviewsPages = 0
@@ -125,6 +128,7 @@ export async function getProfile(data: GetProfileInput) {
           createdAt: reviews.createdAt,
           reviewerId: reviews.reviewerId,
           reviewerName: users.name,
+          reviewerAvatarUrl: users.avatarUrl,
         })
         .from(reviews)
         .innerJoin(users, eq(reviews.reviewerId, users.id))
@@ -143,10 +147,13 @@ export async function getProfile(data: GetProfileInput) {
 
       formattedReviews = reviewsResult.map(review => ({
         id: review.id,
-        reviewerName: review.reviewerName,
+        user: {
+          name: review.reviewerName,
+          avatarUrl: review.reviewerAvatarUrl || null,
+        },
         comment: review.comment,
         rating: Number.parseInt(review.rating.toString()),
-        date: formatRelativeTime(review.createdAt),
+        created_at: review.createdAt.toISOString(),
       }))
     } catch (error) {
       console.log('Reviews table not available, using empty array:', error instanceof Error ? error.message : 'unknown error')
@@ -165,12 +172,10 @@ export async function getProfile(data: GetProfileInput) {
         name: user.name,
         avatarUrl: user.avatarUrl || null,
         location: user.location || null,
-        babyAgeRange: user.babyAgeRange || null,
-        stats: {
-          averageRating: Math.round(averageRating * 10) / 10,
-          itemsSold,
-          itemsBought,
-        },
+        baby_age_range: user.babyAgeRange || null,
+        rating: Math.round(averageRating * 10) / 10,
+        total_sales: itemsSold,
+        total_purchases: itemsBought,
         isCurrentUser,
         reviews: formattedReviews,
         reviewsMeta: {

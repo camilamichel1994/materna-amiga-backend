@@ -13,6 +13,8 @@ import { favoritesRoutes } from './routes/favorites'
 import { chatsRoutes } from './routes/chats'
 import { exchangesRoutes } from './routes/exchanges'
 import { usersRoutes } from './routes/users'
+import { reviewsRoutes } from './routes/reviews'
+import { transactionsRoutes } from './routes/transactions'
 
 const app = fastify({
   logger: true,
@@ -36,6 +38,8 @@ app.register(favoritesRoutes, { prefix: '/favorites' })
 app.register(chatsRoutes, { prefix: '/chats' })
 app.register(exchangesRoutes, { prefix: '/exchanges' })
 app.register(usersRoutes, { prefix: '/users' })
+app.register(reviewsRoutes, { prefix: '/reviews' })
+app.register(transactionsRoutes, { prefix: '/transactions' })
 
 app.listen({ port: env.PORT, host: '0.0.0.0' }).then(() => {
   console.log(`🚀 Server running on http://localhost:${env.PORT}`)
