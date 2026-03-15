@@ -68,17 +68,6 @@ export const favorites = pgTable('favorites', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
 
-export const wishlist = pgTable('wishlist', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id),
-  type: text('type').notNull(),
-  size: text('size'),
-  brand: text('brand'),
-  description: text('description'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-})
-
 export const chats = pgTable('chats', {
   id: uuid('id').primaryKey().defaultRandom(),
   listingId: uuid('listing_id').references(() => listings.id),
